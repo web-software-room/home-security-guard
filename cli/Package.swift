@@ -7,10 +7,16 @@ let package = Package(
     name: "home-observer",
     platforms: [.macOS(.v14)],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.92.4"),
+        .package(url: "https://github.com/lemo-nade-room/cli-kit.git", from: "0.2.0"),
+        .package(url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.0.0"),
     ],
     targets: [
-        .executableTarget(name: "HomeObserver"),
+        .executableTarget(
+            name: "HomeObserver",
+            dependencies: [
+                .product(name: "CLIKit", package: "cli-kit"),
+                .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
+            ]),
         .testTarget(name: "HomeObserverTests", dependencies: ["HomeObserver"]),
     ]
 )
