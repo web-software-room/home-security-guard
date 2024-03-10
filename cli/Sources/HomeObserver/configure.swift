@@ -31,6 +31,9 @@ func configure(app: Application) async throws {
     app.migrations.add(V2024031002CreateInterface())
     app.migrations.add(V2024031003CreateHost())
     app.migrations.add(V2024031004CreateArpScan())
+    app.migrations.add(V2024031005CreateConfigureKey())
+    app.migrations.add(V2024031006CreateConfigure())
+    app.migrations.add(V2024031007DeleteInterfaceHostArpScan())
 
     try await app.autoMigrate()
 }

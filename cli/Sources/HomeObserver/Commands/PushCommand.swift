@@ -8,17 +8,20 @@ struct PushCommand: AsyncCommand {
     let help = "サーバーに状態を送信します。"
 
     func run(using context: ConsoleKitCommands.CommandContext, signature: Signature) async throws {
-        guard let host = try await Host.query(on: context.application.db).first() else {
+        let configures: [ConfigureKey: Configure] = Dictionary(
+            grouping: try await Configure.query(on: context.application.db).all(),
+            by: \.key
+        ).compactMapValues(\.first)
+
+        guard let host = configures[.apiServerHostAddress] else {
             context.console.print("APIサーバーのホストが設定されていません。")
             return
         }
-
-        guard let arpScan = try await ArpScan.query(on: context.application.db).first() else {
+        guard let arpScan = configures[.arpScanPath] else {
             context.console.print("arp-scanが設定されていません。")
             return
         }
-
-        guard let interface = try await Interface.query(on: context.application.db).first() else {
+        guard let interface = configures[.networkInterface] else {
             context.console.print("インターフェイスが設定されていません。")
             return
         }
@@ -29,9 +32,9 @@ struct PushCommand: AsyncCommand {
             return
         }
 
-        let output = try await SwiftCommand.Command(executablePath: .init(arpScan.path))
+        let output = try await SwiftCommand.Command(executablePath: .init(arpScan.value))
             .addArgument("-I")
-            .addArgument(interface.name)
+            .addArgument(interface.value)
             .addArgument("-l")
             .output
 
@@ -49,10 +52,10 @@ struct PushCommand: AsyncCommand {
         let existingMemberNames =
             members
             .filter { foundMacAddresses.contains($0.macAddress) }
-            .map { $0.name }
+            .map(\.name)
 
         let response = try await context.application.client
-            .post(.init(string: host.address), content: existingMemberNames)
+            .post(.init(string: host.value), content: existingMemberNames)
 
         context.console.print("以下のメンバーが在宅です")
         for name in existingMemberNames {

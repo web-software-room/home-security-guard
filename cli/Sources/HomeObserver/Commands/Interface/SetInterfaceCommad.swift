@@ -12,14 +12,14 @@ struct SetInterfaceCommand: AsyncCommand {
     let help = "インターフェイスを設定します"
 
     func run(using context: CommandContext, signature: Signature) async throws {
-        if let interface = try await Interface.query(on: context.application.db).first() {
-            let old = interface.name
-            interface.name = signature.name
-            try await interface.update(on: context.application.db)
+        if let config: Configure = try await .find(.networkInterface, on: context.application.db) {
+            let old = config.value
+            config.value = signature.name
+            try await config.update(on: context.application.db)
             context.console.print("インターフェイスを\(old)から\(signature.name)に変更しました。")
         } else {
-            let interface = Interface(name: signature.name)
-            try await interface.create(on: context.application.db)
+            let config = Configure(key: .networkInterface, value: signature.name)
+            try await config.create(on: context.application.db)
             context.console.print("インターフェイスを\(signature.name)に設定しました。")
         }
     }

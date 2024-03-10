@@ -12,14 +12,16 @@ struct SetHostCommand: AsyncCommand {
     let help = "APIサーバーのホストを設定します"
 
     func run(using context: CommandContext, signature: Signature) async throws {
-        if let host = try await Host.query(on: context.application.db).first() {
-            let old = host.address
-            host.address = signature.address
-            try await host.update(on: context.application.db)
+        if let config: Configure = try await .find(
+            .apiServerHostAddress, on: context.application.db)
+        {
+            let old = config.value
+            config.value = signature.address
+            try await config.update(on: context.application.db)
             context.console.print("APIサーバーのホストを\(old)から\(signature.address)に変更しました。")
         } else {
-            let host = Host(address: signature.address)
-            try await host.create(on: context.application.db)
+            let config = Configure(key: .apiServerHostAddress, value: signature.address)
+            try await config.create(on: context.application.db)
             context.console.print("APIサーバーのホストを\(signature.address)に設定しました。")
         }
     }

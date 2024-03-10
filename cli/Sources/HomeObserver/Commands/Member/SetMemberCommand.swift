@@ -35,15 +35,6 @@ struct SetMemberCommand: AsyncCommand {
         }
     }
 
-    struct MacAddressValidationError: Error {}
-
-    private func extractMacAddress(input: String) throws -> String {
-        guard let match = try macAddressRegex.firstMatch(in: input.lowercased()) else {
-            throw MacAddressValidationError()
-        }
-        return String(match.0)
-    }
-
     private func updateMember(context: CommandContext, member: Member, macAddress: MacAddress)
         async throws
     {

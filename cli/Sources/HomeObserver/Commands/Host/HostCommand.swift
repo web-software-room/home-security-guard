@@ -9,8 +9,10 @@ struct HostCommand: AsyncCommand {
     let help = "設定されているAPIサーバーのホストを表示します。"
 
     func run(using context: CommandContext, signature: Signature) async throws {
-        if let host = try await Host.query(on: context.application.db).first() {
-            context.console.print("APIサーバーのホスト: \(host.address)")
+        if let config: Configure = try await .find(
+            .apiServerHostAddress, on: context.application.db)
+        {
+            context.console.print("APIサーバーのホスト: \(config.value)")
         } else {
             context.console.print("APIサーバーのホストは設定されていません。")
         }

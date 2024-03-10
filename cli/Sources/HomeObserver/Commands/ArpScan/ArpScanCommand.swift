@@ -9,8 +9,8 @@ struct ArpScanCommand: AsyncCommand {
     let help = "設定されているarp-scanのPATHを表示します。"
 
     func run(using context: CommandContext, signature: Signature) async throws {
-        if let arpScan = try await ArpScan.query(on: context.application.db).first() {
-            context.console.print("arp-scanのPATH: \(arpScan.path)")
+        if let config: Configure = try await .find(.arpScanPath, on: context.application.db) {
+            context.console.print("arp-scanのPATH: \(config.value)")
         } else {
             context.console.print("arp-scanのPATHは設定されていません。")
         }
