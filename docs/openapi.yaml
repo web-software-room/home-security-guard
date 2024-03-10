@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: Home Security Guard API
+  description: 誰が在宅中で誰が外出中かを管理するためのAPI
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: ローカルサーバー
+paths:
+  /api/members/status:
+    get:
+      summary: 1ヶ月内に在宅したことのあるメンバーそれぞれのステータスを取得
+      description: |
+        各メンバーが在宅中か、外出中か、最後に外出または帰宅した日時を取得する
+        メンバーは1ヶ月以内に帰宅記録があるもののみが対象
+        メンバーは最後に状態が変更された順にソートされている
+      responses:
+        '200':
+          description: メンバーそれぞれのステータス
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - name
+                    - status
+                    - lastChangedAt
+                  properties:
+                    name:
+                      type: string
+                      description: メンバー名
+                    status:
+                      type: string
+                      enum:
+                        - in
+                        - out
+                    lastChangedAt:
+                      type: string
+                      format: date-time
+                      description: 最後に外出または帰宅した日時
+  /api/member/{name}/change-logs/:
+    get:
+      summary: 指定したメンバーの外出・帰宅記録を取得
+      description: |
+        指定したメンバーの外出・帰宅記録を取得する
+        最大で1ヶ月分の記録を取得する
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            description: メンバー名
+      responses:
+        '200':
+          description: メンバーの外出・帰宅記録
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - toStatus
+                    - changedAt
+                  properties:
+                    toStatus:
+                      type: string
+                      enum:
+                        - in
+                        - out
+                      description: ステータス
+                    changedAt:
+                      type: string
+                      format: date-time
+                      description: 変更日時
+  /api/cli:
+    post:
+      summary: CLIからデータを登録する
+      description: |
+        CLIで、現在在宅中のメンバーのリストを登録する
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                description: メンバー名
+      responses:
+        '204':
+          description: 登録成功
