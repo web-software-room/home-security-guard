@@ -40,10 +40,11 @@ struct PushCommand: AsyncCommand {
             return
         }
 
-        let foundMacAddresses = output.stdout
-            .split(separator: "\n")
-            .compactMap { (try? macAddressRegex.firstMatch(in: $0))?.0 }
-            .map(String.init)
+        let foundMacAddresses: Set<MacAddress> = .init(
+            output.stdout
+                .split(separator: "\n")
+                .compactMap { MacAddress.extract(String($0)) }
+        )
 
         let existingMemberNames =
             members

@@ -9,7 +9,13 @@ struct SetMemberCommand: AsyncCommand {
         var name: String
 
         @Argument(name: "MAC Address", help: "MACアドレス。例: 9E:3E:99:BB:C2:A0")
-        var macAddress: String
+        var rawMacAddress: String
+
+        var macAddress: MacAddress {
+            get throws {
+                try .init(rawMacAddress)
+            }
+        }
     }
 
     let help = "メンバーとそのMACアドレスを追加または更新します"
@@ -20,12 +26,12 @@ struct SetMemberCommand: AsyncCommand {
             .filter(\.$name == signature.name)
             .first()
 
-        let macAddress = try extractMacAddress(input: signature.macAddress)
-
         if let member {
-            try await updateMember(context: context, member: member, macAddress: macAddress)
+            try await updateMember(
+                context: context, member: member, macAddress: signature.macAddress)
         } else {
-            try await createMember(context: context, name: signature.name, macAddress: macAddress)
+            try await createMember(
+                context: context, name: signature.name, macAddress: signature.macAddress)
         }
     }
 
@@ -38,16 +44,16 @@ struct SetMemberCommand: AsyncCommand {
         return String(match.0)
     }
 
-    private func updateMember(context: CommandContext, member: Member, macAddress: String)
+    private func updateMember(context: CommandContext, member: Member, macAddress: MacAddress)
         async throws
     {
-        let oldMacAddress = member.macAddress
+        let oldMacAddress = member.rawMacAddress
         member.macAddress = macAddress
         try await member.update(on: context.application.db)
         context.console.print("\(member.name)のMACアドレスを\(oldMacAddress)から\(macAddress)に更新しました。")
     }
 
-    private func createMember(context: CommandContext, name: String, macAddress: String)
+    private func createMember(context: CommandContext, name: String, macAddress: MacAddress)
         async throws
     {
         let newMember = Member(name: name, macAddress: macAddress)

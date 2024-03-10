@@ -67,3 +67,21 @@ extension MacAddress {
         }
     }
 }
+
+extension MacAddress: CustomStringConvertible {
+    var description: String {
+        raw
+    }
+}
+
+extension MacAddress {
+    /// 1行の文字列からMACアドレスを抽出する.
+    /// - Parameter line: MACアドレスが1つ含まれるかもしれない1行の文字列
+    /// - Returns: MACアドレスが含まれる場合はその値、含まれない場合はnil
+    static func extract(_ line: String) -> Self? {
+        guard let matched = try? macAddressRegex.firstMatch(in: line.lowercased())?.0 else {
+            return nil
+        }
+        return try? .init(String(matched))
+    }
+}

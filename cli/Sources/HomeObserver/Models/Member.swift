@@ -11,7 +11,7 @@ final class Member: Model {
     var name: String
 
     @Field(key: "mac_address")
-    var macAddress: String
+    var rawMacAddress: String
 
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
@@ -21,9 +21,20 @@ final class Member: Model {
 
     init() {}
 
-    init(id: UUID = .init(), name: String, macAddress: String) {
+    init(id: UUID = .init(), name: String, macAddress: MacAddress) {
         self.id = id
         self.name = name
-        self.macAddress = macAddress
+        self.rawMacAddress = macAddress.raw
+    }
+}
+
+extension Member {
+    var macAddress: MacAddress {
+        get {
+            try! MacAddress(rawMacAddress)
+        }
+        set {
+            rawMacAddress = newValue.raw
+        }
     }
 }

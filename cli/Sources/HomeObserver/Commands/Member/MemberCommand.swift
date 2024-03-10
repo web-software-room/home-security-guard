@@ -18,7 +18,7 @@ struct MemberCommand: AsyncCommand {
         }
 
         for member in members {
-            context.console.print("\(member.name)\n\t\(member.macAddress)")
+            context.console.print("\(member.name)\n\t\(member.rawMacAddress)")
         }
     }
 }

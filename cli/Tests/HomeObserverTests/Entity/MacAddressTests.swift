@@ -43,4 +43,20 @@ final class MacAddressTests: XCTestCase {
             XCTAssertEqual(error as? MacAddress.InvalidError, .init(" 01:32:f4:67:89:ab"))
         }
     }
+
+    func test1行の文字列からMACアドレスを抽出する() throws {
+        let line = "192.168.0.11    40:4c:ca:79:d5:e4    Espressif Inc."
+
+        let actual: MacAddress? = .extract(line)
+
+        XCTAssertEqual(actual?.description, "40:4c:ca:79:d5:e4")
+    }
+
+    func test1行の文字列からMACアドレスを抽出できない場合はnilを返す() throws {
+        let line = "192.168.0.11    40:4c:ca:79:d5:g4    Espressif Inc."
+
+        let actual: MacAddress? = .extract(line)
+
+        XCTAssertNil(actual)
+    }
 }
