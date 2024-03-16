@@ -1,4 +1,5 @@
 import Fluent
+import Foundation
 
 final class Member: Model {
 

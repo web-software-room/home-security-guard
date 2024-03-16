@@ -13,7 +13,7 @@ struct SetHostCommand: AsyncCommand {
 
     func run(using context: CommandContext, signature: Signature) async throws {
         if let config: Configure = try await .find(
-            .apiServerHostAddress, on: context.application.db)
+            key: .apiServerHostAddress, on: context.application.db)
         {
             let old = config.value
             config.value = signature.address

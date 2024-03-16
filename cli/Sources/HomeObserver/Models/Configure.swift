@@ -1,4 +1,5 @@
 import Fluent
+import Foundation
 
 /// 設定を保存しておくKey-Valueモデル.
 final class Configure: Model {
@@ -36,7 +37,7 @@ extension Configure {
     ///   - db: データベース
     /// - Throws: データベースエラー
     /// - Returns: 指定されたキーに対応する設定。未設定の場合はnilを返す
-    static func find(_ key: ConfigureKey, on db: any Database) async throws -> Configure? {
+    static func find(key: ConfigureKey, on db: any Database) async throws -> Configure? {
         try await query(on: db)
             .filter(\.$key == key)
             .first()

@@ -4,7 +4,7 @@ import FluentSQLiteDriver
 import NIOSSL
 import Vapor
 
-func configure(app: Application) async throws {
+func configure(_ app: Application) async throws {
     app.asyncCommands.use(PushCommand(), as: "push", isDefault: true)
     app.asyncCommands.use(SetMemberCommand(), as: "set-member")
     app.asyncCommands.use(RemoveMemberCommand(), as: "remove-member")
@@ -26,7 +26,7 @@ func configure(app: Application) async throws {
 
     app.databases.use(
         DatabaseConfigurationFactory.sqlite(
-            .file("\(NSHomeDirectory())/.homep-observer/db.sqlite")), as: .sqlite)
+            .file("\(homeDirectoryPath)/.homep-observer/db.sqlite")), as: .sqlite)
     app.migrations.add(V2024031001CreateMember())
     app.migrations.add(V2024031002CreateInterface())
     app.migrations.add(V2024031003CreateHost())

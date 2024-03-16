@@ -12,7 +12,7 @@ struct SetArpScanCommand: AsyncCommand {
     let help = "arp-scanのPATHを設定します"
 
     func run(using context: CommandContext, signature: Signature) async throws {
-        if let config: Configure = try await .find(.arpScanPath, on: context.application.db) {
+        if let config: Configure = try await .find(key: .arpScanPath, on: context.application.db) {
             let old = config.value
             config.value = signature.path
             try await config.update(on: context.application.db)

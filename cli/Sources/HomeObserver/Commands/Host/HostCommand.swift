@@ -10,7 +10,7 @@ struct HostCommand: AsyncCommand {
 
     func run(using context: CommandContext, signature: Signature) async throws {
         if let config: Configure = try await .find(
-            .apiServerHostAddress, on: context.application.db)
+            key: .apiServerHostAddress, on: context.application.db)
         {
             context.console.print("APIサーバーのホスト: \(config.value)")
         } else {
